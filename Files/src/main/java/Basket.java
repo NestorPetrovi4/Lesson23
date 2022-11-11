@@ -5,6 +5,7 @@ public class Basket {
     private int[] price;
     private int[] baskets;
     private int sumFood;
+    private ClientLog clientLog = new ClientLog();
 
     public Basket(int[] price, String[] food) {
         this.food = food;
@@ -17,6 +18,7 @@ public class Basket {
         sumFood += amount * price[productNum];
         File basketTxt = new File("Basket.txt");
         saveTxt(basketTxt);
+        clientLog.log(productNum, amount);
     }
 
     public void setBaskets(int[] baskets) {
@@ -53,6 +55,7 @@ public class Basket {
             listFood.append("Итоговая сумма покупки = " + sumFood + " руб");
             System.out.println(listFood.toString());
         }
+        clientLog.exportAsCSV(new File("log.csv"));
     }
 
     public void saveTxt(File textFile) {
