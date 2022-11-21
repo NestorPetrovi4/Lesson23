@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        File basketTxt = new File("Basket.txt");
+        File basketTxt = new File("Basket.json");
         Basket basket = (basketTxt.exists()) ? Basket.loadFromTxtFile(basketTxt) : new Basket(new int[]{59, 150, 243, 30, 580},
                 new String[]{"Хлеб", "Масло", "Чай", "Вода", "Колбаса"});
 

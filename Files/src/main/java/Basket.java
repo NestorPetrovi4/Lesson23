@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 
 public class Basket {
@@ -16,17 +19,9 @@ public class Basket {
     public void addToCart(int productNum, int amount) {
         baskets[productNum] += amount;
         sumFood += amount * price[productNum];
-        File basketTxt = new File("Basket.txt");
+        File basketTxt = new File("Basket.json");
         saveTxt(basketTxt);
         clientLog.log(productNum, amount);
-    }
-
-    public void setBaskets(int[] baskets) {
-        this.baskets = baskets;
-        sumFood = 0;
-        for (int i = 0; i < baskets.length; i++) {
-            sumFood = sumFood + (baskets[i] * price[i]);
-        }
     }
 
     public int[] getPrice() {
@@ -60,7 +55,9 @@ public class Basket {
 
     public void saveTxt(File textFile) {
         try (FileOutputStream fos = new FileOutputStream(textFile)) {
-            String stringArray = getStringToArray();
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String stringArray = gson.toJson(this);
             // перевод строки в массив байтов
             byte[] bytes = stringArray.getBytes();
             // запись байтов в файл
@@ -70,40 +67,17 @@ public class Basket {
         }
     }
 
-    public String getStringToArray() {
-        String bask = "";
-        String priceStr = "";
-        String foodStr = "";
-        for (int i = 0; i < baskets.length; i++) {
-            bask = bask + baskets[i] + ((i == baskets.length - 1) ? "" : " ");
-            priceStr = priceStr + price[i] + ((i == baskets.length - 1) ? "" : " ");
-            foodStr = foodStr + food[i] + ((i == baskets.length - 1) ? "" : " ");
-        }
-        return bask + "\n" + priceStr + "\n" + foodStr;
-    }
-
     public static Basket loadFromTxtFile(File textFile) {
-        String[] baskArr;
-        String[] priceArr;
-        String[] foodArr;
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        String textJson = "";
         try (BufferedReader reader = new BufferedReader(new FileReader(textFile))) {
-            baskArr = reader.readLine().split(" ");
-            priceArr = reader.readLine().split(" ");
-            foodArr = reader.readLine().split(" ");
+            textJson = reader.readLine();
+            reader.close();
         } catch (IOException ex) {
-            baskArr = new String[0];
-            priceArr = new String[0];
-            foodArr = new String[0];
             System.out.println(ex.getMessage());
         }
-        int[] price = new int[foodArr.length];
-        int[] bask = new int[foodArr.length];
-        for (int i = 0; i < foodArr.length; i++) {
-            price[i] = Integer.parseInt(priceArr[i]);
-            bask[i] = Integer.parseInt(baskArr[i]);
-        }
-        Basket basket = new Basket(price, foodArr);
-        basket.setBaskets(bask);
+        Basket basket = gson.fromJson(textJson, Basket.class);
         return basket;
     }
 }
